@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>클릭하면 권우혁 비 내리기</title>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background-color: #2c3e50; /* 어두운 푸른색 배경 */
+            color: white;
+            font-family: 'Malgun Gothic', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        h1 {
+            z-index: 10;
+            font-size: 3.5em; /* 글자 크기 더 크게 */
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.6);
+            color: #ecf0f1; /* 밝은 회색 */
+        }
+
+        p {
+            z-index: 10;
+            font-size: 1.3em;
+            margin-top: 25px;
+            color: #bdc3c7; /* 조금 더 어두운 회색 */
+        }
+
+        #name-container { /* 털터 대신 name-container로 변경 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .name-text { /* turter 대신 name-text로 변경 */
+            position: absolute;
+            font-size: 2.5em; /* 글자 크기 조금 키움 */
+            font-weight: bold;
+            color: #f1c40f; /* 밝은 노란색 (눈에 잘 띄게) */
+            opacity: 0;
+            animation: fall linear infinite;
+            text-shadow: 0 0 12px rgba(241, 196, 15, 0.8); /* 빛나는 효과 강화 */
+        }
+
+        @keyframes fall {
+            0% {
+                top: -5%;
+                opacity: 1;
+                transform: translateX(0) rotate(0deg);
+            }
+            100% {
+                top: 105%;
+                opacity: 0;
+                transform: translateX(var(--end-x)) rotate(var(--end-rotate));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="name-container"></div>
+    <h1>화면을 클릭하면 '권우혁' 비가 내립니다!</h1>
+    <p>아무 곳이나 클릭해 주세요.</p>
+
+    <script>
+        const container = document.getElementById('name-container'); // ID 변경
+        const nameToRain = '권우혁'; // 텍스트만 변경
+        let isRainStarted = false;
+        let intervalId = null;
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function createFallingName() {
+            const nameElement = document.createElement('span');
+            nameElement.textContent = nameToRain;
+            nameElement.classList.add('name-text'); // 클래스명 변경
+
+            const startX = getRandomInt(0, window.innerWidth);
+            nameElement.style.left = startX + 'px';
+
+            const duration = getRandomInt(8, 15);
+            const delay = getRandomInt(0, 5);
+            nameElement.style.animationDuration = duration + 's';
+            nameElement.style.animationDelay = delay + 's';
+            
+            nameElement.style.fontSize = getRandomInt(18, 40) / 10 + 'em'; // 글자 크기 범위 조정
+            
+            const endX = getRandomInt(-200, 200);
+            const endRotate = getRandomInt(-720, 720);
+            
+            nameElement.style.setProperty('--end-x', endX + 'px');
+            nameElement.style.setProperty('--end-rotate', endRotate + 'deg');
+
+            container.appendChild(nameElement);
+
+            nameElement.addEventListener('animationend', () => {
+                nameElement.remove();
+            });
+        }
+
+        function startRain() {
+            if (isRainStarted) return;
+            
+            isRainStarted = true;
+            document.body.style.cursor = 'default';
+
+            document.querySelector('h1').textContent = '권우혁 비가 내립니다!';
+            document.querySelector('p').textContent = '다시 클릭하면 비가 멈춥니다.';
+
+            intervalId = setInterval(createFallingName, 100);
+
+            for (let i = 0; i < 30; i++) {
+                setTimeout(createFallingName, i * 50);
+            }
+        }
+
+        function stopRain() {
+            if (!isRainStarted) return;
+
+            isRainStarted = false;
+            clearInterval(intervalId);
+
+            const allNames = document.querySelectorAll('.name-text');
+            allNames.forEach(nameElement => nameElement.remove());
+
+            document.body.style.cursor = 'pointer';
+
+            document.querySelector('h1').textContent = '화면을 클릭하면 \'권우혁\' 비가 내립니다!';
+            document.querySelector('p').textContent = '아무 곳이나 클릭해 주세요.';
+        }
+
+        document.body.addEventListener('click', () => {
+            if (!isRainStarted) {
+                startRain();
+            } else {
+                stopRain();
+            }
+        });
+    </script>
+</body>
+</html>
